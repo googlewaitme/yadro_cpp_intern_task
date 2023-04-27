@@ -1,0 +1,1 @@
+# yadro_cpp_intern_task
