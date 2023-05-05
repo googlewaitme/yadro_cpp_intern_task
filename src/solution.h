@@ -4,9 +4,13 @@
 
 class Solution {
 private:
-	int _size_of_temp_tapes;
+	// TODO rename this
+	// k - count integer can fit in RAM
+	int _k;
 public:
-	Solution(int size_of_temp_tapes);
+	Solution(int count_integers_fit_in_ram);
 
-	void sortTape(BaseTape<int> input, BaseTape<int> output);
+	void sortTape(BaseTape<int>* input, BaseTape<int>* output);
+
+	void inputData(BaseTape<int>* input, BaseTape<int>* temp1, BaseTape<int>* temp2);
 };

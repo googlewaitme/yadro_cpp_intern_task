@@ -17,28 +17,31 @@ public:
 		_tape_position = 0;
 	}
 
-	int getTapePosition() {
+	int getTapePosition() override {
 		return _tape_position;
 	}
-	void moveTape(int step) {
+
+	int getSize() override {
+		return _size;
+	}
+
+	void moveTape(int step) override {
 		_tape_position += step;
 		assert(_tape_position >= 0);
 		assert(_tape_position < _size);
 	}
-	void write(T to_write_element) {
+	void write(T to_write_element) override {
 		_array[_tape_position] = to_write_element;
 	}
 
-	T read() {
+	T read() override {
 		return _array[_tape_position];
 	}
-	T readDown() {
-		moveTape(-1);
-		return _array[_tape_position];
+	T readDown() override {
+		return _array[_tape_position--];
 	}
-	T readUp() {
-		moveTape(1);
-		return _array[_tape_position];
+	T readUp() override {
+		return _array[_tape_position++];
 	}
 };
 

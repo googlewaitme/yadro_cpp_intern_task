@@ -14,7 +14,8 @@ public:
 	BaseTape() {};
 	~BaseTape() {};
 
-	int getTapePosition();
+	virtual int getTapePosition() = 0;
+	virtual int getSize() = 0;
 	virtual void moveTape(int step) = 0;
 	virtual void write(T to_write_element) = 0;
 	virtual T read() = 0;
