@@ -28,7 +28,8 @@ public:
 	void moveTape(int step) override {
 		_tape_position += step;
 		assert(_tape_position >= 0);
-		assert(_tape_position < _size);
+		// TODO question <= or < ? 
+		assert(_tape_position <= _size);
 	}
 	void write(T to_write_element) override {
 		_array[_tape_position] = to_write_element;
@@ -41,6 +42,7 @@ public:
 		return _array[_tape_position--];
 	}
 	T readUp() override {
+		// TODO change to moveTape
 		return _array[_tape_position++];
 	}
 };
