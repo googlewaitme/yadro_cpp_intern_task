@@ -26,6 +26,7 @@ private:
 	void readInRam();
 	void sortRam();
 	void printRam();
+	void writeRamToTape();
 	void writeRamToTape(BaseTape<int>* tape);
 
 	void mergeTapes();

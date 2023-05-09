@@ -21,4 +21,7 @@ public:
 	virtual T read() = 0;
 	virtual T readDown() = 0;
 	virtual T readUp() = 0;
+	// TODO delete me
+	
+	virtual void print_array() = 0;
 };

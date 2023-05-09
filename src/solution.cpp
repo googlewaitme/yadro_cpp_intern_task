@@ -1,9 +1,12 @@
-#include "solution.h"
-#include "base_tape.h"
-#include "array_tape.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <cassert>
+
+
+#include "solution.h"
+#include "base_tape.h"
+#include "array_tape.h"
 
 
 Solution::Solution(
@@ -42,6 +45,10 @@ void Solution::sortTape() {
 		mergeTapes();
 		sorted = splitOutputToTapes();
 	}
+	// TODO delete this
+	std::cout << "\n\n answer \n\n";
+	_output->print_array();
+	std::cout << "\n\n";
 }
 
 
@@ -52,14 +59,9 @@ void Solution::inputData() {
 	for (int i=0; i < count_of_full_sets; i++) {
 		readInRam();
 		sortRam();
-
 		printRam();
-		// TODO change to array of tapes;
-		if (i % 2 == 0) {
-			writeRamToTape(_temp1);
-		} else {
-			writeRamToTape(_temp2);
-		}
+		changeTempTape();
+		writeRamToTape();
 	}
 }
 
@@ -93,6 +95,10 @@ void Solution::writeRamToTape(BaseTape<int>* tape) {
 	}
 }
 
+void Solution::writeRamToTape() {
+	writeRamToTape(_temp_tape);
+}
+
 
 void Solution::mergeTapes() {
 	/*
@@ -109,54 +115,79 @@ void Solution::mergeTapes() {
 	на последний элемент.
 	 */
 	std::cout << "Start merge" << std::endl;
-	std::cout << "t1pos, t2pos: " << _temp1->getTapePosition();
-	std::cout << " " << _temp2->getTapePosition() << std::endl;
 
 
-	_temp1 -> moveTape(-1);
-	_temp2 -> moveTape(-1);
-	int temp1_el = _temp1->readDown(),
-		temp2_el = _temp2->readDown();
-	int temp1_pos = _temp1->getTapePosition(),
-		temp2_pos = _temp2->getTapePosition();
-	while (temp1_pos > 0 and temp2_pos > 0) {
-		if (temp1_el > temp2_el) {
-			_output->write(temp1_el);
-			temp1_el = _temp1->readDown();	
+	std::cout << "temp1" << std::endl;
+	_temp1->print_array();
+	std::cout << "temp2" << std::endl;
+	_temp2->print_array();
+
+	int len_temp1 = _temp1->getTapePosition(),
+		len_temp2 = _temp2->getTapePosition();
+	std::cout << "len(temp1), len(temp2): " << len_temp1 << " " << len_temp2 << std::endl;
+	assert(len_temp1 + len_temp2 == _output->getSize());
+
+	int in_memory1, in_memory2, to_write_in_output;
+	if (len_temp1 > 0) {
+		_temp1 -> moveTape(-1);
+		in_memory1=_temp1->readDown();
+	}
+	if (len_temp2 > 0) {
+		_temp2 -> moveTape(-1);
+		in_memory2=_temp2->readDown();
+	}
+
+	std::cout << "start " << in_memory1 << " " << in_memory2 << std::endl;
+	
+	while (len_temp1 > 0 && len_temp2 > 0) {
+		if (in_memory1 > in_memory2) {
+			std::cout << "temp1" << " " << in_memory1 << std::endl;
+			to_write_in_output = in_memory1;
+			len_temp1--;
+			if (len_temp1 > 1)
+				in_memory1 = _temp1->readDown();
+			else
+				in_memory1 = _temp1->read();
 		} else {
-			_output->write(temp2_el);
-			temp2_el = _temp2->readDown();	
+			std::cout << "temp2" << " " << in_memory2 << std::endl;
+			to_write_in_output = in_memory2;
+			len_temp2--;
+			if (len_temp2 > 1)
+				in_memory2 = _temp2->readDown();
+			else
+				in_memory2 = _temp2->read();
 		}
+		_output->write(to_write_in_output);
 		_output->moveTape(1);
-		temp1_pos = _temp1->getTapePosition(),
-		temp2_pos = _temp2->getTapePosition(),
-		std::cout << "t1pos, t2pos: " << temp1_pos <<  " " << temp2_pos << std::endl;
-		std::cout << "t1, t2: " << temp1_el << " " << temp2_el << std::endl;
+		std::cout << "Added in output: " << to_write_in_output << std::endl;
+	}
+	
+
+	while (len_temp1 > 0) {
+		_output->write(in_memory1);
+		_output->moveTape(1);
+		std::cout << "Added in output(last in temp1): " << in_memory1 << std::endl;
+		len_temp1--;
+		if (len_temp1 > 1)
+			in_memory1 = _temp1->readDown();
+		else 
+			in_memory1 = _temp1->read();
 	}
 
-	// Здесь => потому у нас в прошлом цикле в кэш мы считали переменную. 
-	while (temp1_pos >= 0) {
-		_output->write(temp1_el);
+	while (len_temp2 > 0) {
+		_output->write(in_memory2);
 		_output->moveTape(1);
-		if (temp1_pos > 0)
-			temp1_el = _temp1->readDown();
+		std::cout << "Added in output(last in temp2): " << in_memory2 << std::endl;
+		len_temp2--;
+		if (len_temp2 > 1)
+			in_memory2 = _temp2->readDown();
 		else
-			break;
-		temp1_pos = _temp1->getTapePosition();
-		std::cout << "t1, t1pos: " << temp1_el << " " << temp1_pos << std::endl;
+			in_memory2 = _temp2->read();
 	}
 
-	while (temp2_pos >= 0) {
-		_output->write(temp2_el);
-		_output->moveTape(1);
-		if (temp2_pos > 0)
-			temp2_el = _temp2->readDown();	
-		else
-			break;
-		temp2_pos = _temp2->getTapePosition();
-		std::cout << "t2, t2pos: " << temp2_el << " " << temp2_pos << std::endl;
-	}
-
+	std::cout << "output array:\n";
+	_output->print_array();
+	assert(_output->getTapePosition() == _output->getSize());		
 	std::cout << "End merge" << std::endl;
 }
 
@@ -178,24 +209,34 @@ bool Solution::splitOutputToTapes() {
 	*/
 	std::cout << "start split" << std::endl;
 
-	// TODO how calculate current_element and solve this problem
-	int last_element, current_element;
+	assert(_temp1->getTapePosition() == 0);
+	assert(_temp2->getTapePosition() == 0);
+	assert(_temp_tape->getTapePosition() == 0);
+	assert(_output->getTapePosition() == _output->getSize());
+	// Самое главное, чтобы в начале текущий элемент не был равен, предыдущему.
+	// КОСТЫЛЬ!!!
+	_output->moveTape(-1);
+	int current_element = _output->readDown();
+	int last_element = current_element-1;
 	bool sorted = true;
 	for (int i=0; i < _output->getSize(); i++) {
-		last_element = current_element;
-		current_element = _output->readDown();
-
 		if (last_element > current_element) {
 			changeTempTape();
 			sorted = false;
+			std::cout << "array not sorted, change tape" << std::endl;
 		}
 		_temp_tape->write(current_element);
-		std::cout << _temp_tape->getTapePosition() << std::endl;
 		_temp_tape->moveTape(1);
 		std::cout << "tape_number, el: " << _current_temp_tape << " "; 
 		std::cout << current_element << std::endl;
+		last_element = current_element;
+		if (i+2 < _output->getSize())
+			current_element = _output->readDown();
+		else
+			current_element = _output->read();
 	}
 
+	assert(_temp1->getTapePosition() + _temp2->getTapePosition() == _output->getSize());
 	std::cout << "output is sorted: " << sorted << std::endl;
 	std::cout << "end split" << std::endl;
 	return sorted;
