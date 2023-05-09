@@ -19,12 +19,18 @@ private:
 
 	BaseTape<int>* _temp1;
 	BaseTape<int>* _temp2;
+	BaseTape<int>* _temp_tape;
+	int _current_temp_tape;
 
 
 	void readInRam();
 	void sortRam();
 	void printRam();
 	void writeRamToTape(BaseTape<int>* tape);
+
+	void mergeTapes();
+	bool splitOutputToTapes();
+	void changeTempTape();
 public:
 	Solution(
 		int count_integers_fit_in_ram,

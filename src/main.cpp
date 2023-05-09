@@ -12,12 +12,12 @@ void printTapeOnScreen(BaseTape<int>* tape);
 
 int main() {
     std::srand(std::time(nullptr)); 
-	int n = 85, ram_size = 10;
+	int n = 10, ram_size = 3;
 	std::vector<int> test_data;
 	for (int i = 0; i < n; i++) {
 		test_data.push_back(random(0, 100));
 		std::cout << test_data[i] << " ";
-		if (i > 0 && i % ram_size == 0) {
+		if (i > 0 && (i+1) % ram_size == 0) {
 			std::cout << std::endl;
 		}
 	}
@@ -40,6 +40,9 @@ int main() {
 
 	std::cout << "temp2" << std::endl;
 	printTapeOnScreen(temp2);
+
+	std::cout << "output" << std::endl;
+	printTapeOnScreen(output);
 
 	delete input;
 	delete output;
